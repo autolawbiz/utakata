@@ -22,7 +22,7 @@ session_start();
 				// 高精度な位置情報を取得するか(デフォルトはfalse)
 				enableHightAccuracy: true,
 				// 何秒でタイムアウトとするか(ミリ秒。タイムアウトするとerrorCallback()がコールされる)
-				timeout: 120000,
+				timeout: 20000,
 				// 取得した位置情報をキャッシュする時間(ミリ秒。デフォルトは0)
 				maximumAge: 0
 			}
@@ -178,7 +178,7 @@ session_start();
 				</div>
 				<div class="collapse navbar-collapse" id="navigation">
 <?php
-                    if (isset($_SESSION["NAME"])) {
+                    if (isset($_SESSION["NAME"]) && isset($_SESSION["ID"])) {
 ?>
                         <p class="navbar-text navbar-right"><a class="btn btn-primary" href="logout.php">ログアウト</a></p>
 <?php
@@ -193,21 +193,24 @@ session_start();
 		</nav>
 		<div class="container">
 <?php
-                    if (isset($_SESSION["NAME"])) {
+                    if (isset($_SESSION["NAME"]) && isset($_SESSION["ID"])) {
 ?>
                         <p>ようこそ<?php echo htmlspecialchars($_SESSION["NAME"], ENT_QUOTES); ?>さん</p>  <!-- ユーザー名をechoで表示 -->
                         <form action="upload.php" method="post" enctype="multipart/form-data">
                             <p><button type="button" class="btn btn-primary" onclick="start()">スタート</button>&nbsp;<button type="button" class="btn btn-primary" onclick="stop()">ストップ</button></p>
                             <div id="message"></div>
                             <div class="form-group">
-                                <input type="text" class="form-control" id="idoLat" placeholder="緯度">
+                                <input type="text" class="form-control" id="idoLat" name="idoLat" placeholder="緯度">
                             </div>
                             <div class="form-group">
-                                <input type="text" class="form-control" id="keidoLon" placeholder="経度">
+                                <input type="text" class="form-control" id="keidoLon" name="keidoLon" placeholder="経度">
                             </div>
                             <div id="confirm"></div>
                             <div class="form-group">
                                 <input type="file" class="btn btn-primary" id="capture" name="capture" accept="image/*" capture="camera">				
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="comment" name="comment" placeholder="コメント">
                             </div>
                             <button type="submit" class="btn btn-primary">位置情報登録</button>
                         </form>

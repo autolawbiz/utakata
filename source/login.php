@@ -37,6 +37,7 @@ if (isset($_POST["login"])) {
 
 					// 入力したIDのユーザー名を取得
 					$id = $row['id'];
+                    $_SESSION["ID"] = $id;
 					$sql = "SELECT * FROM userData WHERE id = $id";  //入力したIDからユーザー名を取得
 					$stmt = $pdo->query($sql);
 					foreach ($stmt as $row) {

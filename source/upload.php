@@ -17,7 +17,7 @@ if (!empty($_POST["idoLat"]) && !empty($_POST["keidoLon"]) && isset($_SESSION["I
     $idoLat = $_POST["idoLat"];
     $keidoLon = $_POST["keidoLon"];
     $geo = "GeomFromText('POINT(".$idoLat." ".$keidoLon.")')";
-    echo $geo."<br />";
+    //echo $geo."<br />";
     if (is_uploaded_file($_FILES["capture"]["tmp_name"])){
         move_uploaded_file($_FILES["capture"]["tmp_name"], $_FILES["capture"]["name"]);
         $photoFile = $_FILES["capture"]["name"];

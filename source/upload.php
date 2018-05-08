@@ -37,12 +37,14 @@ if (!empty($_POST["idoLat"]) && !empty($_POST["keidoLon"]) && isset($_SESSION["I
         $pdo = new PDO($dsn, $db['user'], $db['pass'], array(PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION));
 
         //$stmt = $pdo->prepare("INSERT INTO utakataTable(comment, geo, file, userid) VALUES (:comment, :geo, :photoFile, :userid)");
-        $stmt = $pdo->prepare("INSERT INTO utakataTable(comment, geo, file, userid) VALUES (:comment, ".$geo.", :photoFile, :userid)");
+        $stmt = $pdo->prepare("INSERT INTO utakataTable(comment, geo, file, userid, lat, lon) VALUES (:comment, ".$geo.", :photoFile, :userid, :lat,  :lon)");
 
         $stmt->bindParam(':comment', $comment, PDO::PARAM_STR);
         //$stmt->bindParam(':geo', $geo, PDO::PARAM_STR);
         $stmt->bindParam(':photoFile', $photoFile, PDO::PARAM_STR);
         $stmt->bindParam(':userid', $userid, PDO::PARAM_INT);
+        $stmt->bindParam(':lat', $idoLat, PDO::PARAM_STR);
+        $stmt->bindParam(':lon', $keidoLon, PDO::PARAM_STR);
 
 
         $stmt->execute();

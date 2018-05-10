@@ -18,11 +18,18 @@ if (!empty($_POST["idoLat"]) && !empty($_POST["keidoLon"]) && isset($_SESSION["I
     $keidoLon = $_POST["keidoLon"];
     $geo = "GeomFromText('POINT(".$idoLat." ".$keidoLon.")')";
     //echo $geo."<br />";
+    //$photoFile="";
     if (is_uploaded_file($_FILES["capture"]["tmp_name"])){
         move_uploaded_file($_FILES["capture"]["tmp_name"], $_FILES["capture"]["name"]);
         $photoFile = $_FILES["capture"]["name"];
+        $image = new Imagick($photoFile);
+        $image->cropThumbnailImage(300, 300);
+        $image->writeImage("thumb_".$photoFile);
+        //convert $photoFile -resize 150×150 "thumb_".$photoFile;
+        //convert $_FILES["capture"]["name"] -resize 1000x1000 "thumb_".$_FILES["capture"]["name"]
         echo "upload success<br />";
-        echo '<a class="btn btn-link" target="_blank" href="'. $_FILES["capture"]["name"] . '">view file</a><br />';
+        //echo '<a class="btn btn-link" target="_blank" href="'. $_FILES["capture"]["name"] . '">view file</a><br />';
+        echo '<a class="btn btn-link" target="_blank" href="'. $photoFile . '">view file</a><br />';
     } else {
         $photoFile = "";
         echo "no upload file<br />";

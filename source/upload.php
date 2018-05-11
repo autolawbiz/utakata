@@ -17,16 +17,41 @@ if (!empty($_POST["idoLat"]) && !empty($_POST["keidoLon"]) && isset($_SESSION["I
     $idoLat = $_POST["idoLat"];
     $keidoLon = $_POST["keidoLon"];
     $geo = "GeomFromText('POINT(".$idoLat." ".$keidoLon.")')";
-    //echo $geo."<br />";
-    //$photoFile="";
+    
     if (is_uploaded_file($_FILES["capture"]["tmp_name"])){
         move_uploaded_file($_FILES["capture"]["tmp_name"], $_FILES["capture"]["name"]);
         $photoFile = $_FILES["capture"]["name"];
-        $image = new Imagick($photoFile);
-        $image->cropThumbnailImage(300, 300);
-        $image->writeImage("thumb_".$photoFile);
-        //convert $photoFile -resize 150×150 "thumb_".$photoFile;
-        //convert $_FILES["capture"]["name"] -resize 1000x1000 "thumb_".$_FILES["capture"]["name"]
+        
+        $im = new Imagick($photoFile);
+        $im->cropThumbnailImage(48, 48);
+        $orientation = $im->getImageOrientation();
+        switch ($orientation) {
+            case 2: // Mirror horizontal
+                $im->flopImage();
+                break;
+            case 3: // Rotate 180
+                $im->rotateImage('#000000', 180);
+                break;
+            case 4: // Mirror vertical
+                $im->flipImage();
+                break;
+            case 5: // Mirror horizontal and rotate 270
+                $im->flopImage();
+                $im->rotateImage('#000000', 270);
+                break;
+            case 6: // Rotate 90
+                $im->rotateImage('#000000', 90);
+                break;
+            case 7: // Mirror horizontal and rotate 90
+                $im->flopImage();
+                $im->rotateImage('#000000', 90);
+                break;
+            case 8: // Rotate 270
+                $im->rotateImage('#000000', 270);
+                break;
+        }
+        $im->stripImage();
+        $im->writeImage("thumb_".$photoFile);        
         echo "upload success<br />";
         //echo '<a class="btn btn-link" target="_blank" href="'. $_FILES["capture"]["name"] . '">view file</a><br />';
         echo '<a class="btn btn-link" target="_blank" href="'. $photoFile . '">view file</a><br />';

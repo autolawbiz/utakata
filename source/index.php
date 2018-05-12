@@ -15,6 +15,20 @@ session_start();
 		<!-- BootstrapのJS読み込み -->
 		<script src="js/bootstrap.min.js"></script>
 		
+        <style>
+            /* Always set the map height explicitly to define the size of the div
+            * element that contains the map. */
+            #map {
+                height: 80%;
+            }
+            /* Optional: Makes the sample page fill the window. */
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+
 		<script type="text/javascript">
 		</script>
 	</head>
@@ -33,7 +47,11 @@ session_start();
 <?php
                     if (isset($_SESSION["NAME"])) {
 ?>
-					<p class="navbar-text navbar-right"><a class="btn btn-primary" href="logout.php">ログアウト</a></p>
+                        <p class="navbar-text navbar-right"><a class="btn btn-primary" href="input.php">登録</a>&nbsp;<a class="btn btn-primary" href="logout.php">ログアウト</a></p>
+<?php
+                    } else {
+?>
+                        <p class="navbar-text navbar-right"><a class="btn btn-primary" href="login.php">ログイン</a></p>
 <?php
                     }
 ?>
@@ -42,20 +60,156 @@ session_start();
 		</nav>
 		<div class="container">
 <?php
-                    if (isset($_SESSION["NAME"])) {
+            if (isset($_SESSION["NAME"])) {
 ?>
-                        <p>ようこそ<?php echo htmlspecialchars($_SESSION["NAME"], ENT_QUOTES); ?>さん</p>  <!-- ユーザー名をechoで表示 -->
-                        <a class="btn btn-primary" href="input.php">位置情報登録画面へ</a>
-                        <!--ユーザのコンテンツリスト-->
+                <p>ようこそ<?php echo htmlspecialchars($_SESSION["NAME"], ENT_QUOTES); ?>さん</p>  <!-- ユーザー名をechoで表示 -->
+                <!--ユーザのコンテンツリスト-->
 <?php
-                    } else {
+            } else {
 ?>
-                        <p>ようこそゲストさん</p>  <!-- ユーザー名をechoで表示 -->
-                        <a class="btn btn-primary" href="login.php">ログイン画面へ</a>
-                        <!--サイト説明、紹介文、事業理念など-->
+                <p>ようこそゲストさん</p>  <!-- ユーザー名をechoで表示 -->
+                <!--サイト説明、紹介文、事業理念など-->
 <?php
-                    }
+            }
 ?>
 		</div>
+        <div id="map" class="container"></div>
+        <script type="text/javascript">
+            var map;
+            var watchId;
+			// 位置情報取得処理に渡すオプション
+			var options = {
+				// 高精度な位置情報を取得するか(デフォルトはfalse)
+				enableHightAccuracy: true,
+				// 何秒でタイムアウトとするか(ミリ秒。タイムアウトするとerrorCallback()がコールされる)
+				timeout: 5000,
+				// 取得した位置情報をキャッシュする時間(ミリ秒。デフォルトは0)
+				maximumAge: 0
+			}
+            function initMap() {
+                
+				// メッセージ表示領域をクリア
+				// document.getElementById("message").innerHTML = "";
+
+				// ブラウザがGeolocation APIに対応しているかをチェック
+				if (navigator.geolocation) {
+					// 対応している → 位置情報取得開始
+					// 位置情報取得成功時にsuccessCallback()、そして取得失敗時にerrorCallback()がコールされる
+					// optionsはgetCurrentPosition()に渡す設定値
+					//navigator.geolocation.getCurrentPosition(successCallback, errorCallback , options);
+                    watchId = navigator.geolocation.watchPosition(successCallback, errorCallback , options);
+
+					// メッセージを表示。↑は非同期処理なので、直ぐにメッセージが表示される
+					//document.getElementById("message").innerHTML = "測位中...<br />";
+                    
+
+				} else {
+					// 対応していない → alertを表示するのみ
+					//alert("Geolocation not supported in this browser");
+					//document.getElementById("message").innerHTML = "位置情報は利用できません<br /><br />";
+				}
+            }
+
+			// 位置情報取得処理が成功した時にコールされる関数
+			// 引数として、coords(coordinates。緯度・経度など)とtimestamp(タイムスタンプ)の2つを持ったpositionが渡される
+			function successCallback(position){
+				// メッセージを表示
+				// document.getElementById("message").innerHTML += "API成功<br />";
+
+				// 引数positionからcoordinates(緯度・経度など)を取り出す
+				// ただし、“★必ず取得できる”以外は中身が空っぽの可能性もある
+
+				// 緯度(-180～180度) ★必ず取得できる
+				var latitude = position.coords.latitude;
+
+				// 経度(-90～90度) ★必ず取得できる
+				var longitude = position.coords.longitude;
+
+				// 高度(m)
+				var altitude = position.coords.altitude;
+
+				// 緯度・経度の誤差(m) ★必ず取得できる
+				var accuracy = position.coords.accuracy;
+
+				// 高度の誤差(m)
+				var altitudeAccuracy = position.coords.altitudeAccuracy;
+
+				// 方角(0～360度)
+				var heading = position.coords.heading;
+
+				// 速度(m/秒)
+				var speed = position.coords.speed;
+
+
+				// 引数positionからtimestamp(位置情報を取得した時刻のミリ秒)を取り出す ★必ず取得できる
+				var timestamp = position.timestamp;
+
+				// timestampをDate型に変換
+				var successDate = new Date(timestamp);
+                
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat: latitude, lng: longitude},
+                    zoom: 18
+                });
+                navigator.geolocation.clearWatch(watchId);
+				// メッセージを表示
+				// document.getElementById("message").innerHTML += "取得日時：" + successDate.toLocaleString() + "<br />";
+				//document.getElementById("idoLat").value = latitude;
+				//document.getElementById("keidoLon").value = longitude;
+				// document.getElementById("message").innerHTML += "高度：" + altitude + " m<br />";
+				// document.getElementById("message").innerHTML += "緯度・経度の誤差：" + accuracy + " m<br />";
+				// document.getElementById("message").innerHTML += "高度の誤差：" + altitudeAccuracy + " m<br />";
+				// document.getElementById("message").innerHTML += "方角：" + heading + " 度<br />";
+				// document.getElementById("message").innerHTML += "速度：" + speed + " m/秒<br />";
+
+				// 緯度・経度を地図上で確認するためにGoogleMapへのリンクを作成
+				//document.getElementById("confirm").innerHTML = "<a class='btn btn-primary' target='_blank' href='https://maps.google.co.jp/maps?q=" 
+				//    + latitude + "," + longitude + "+%28%E7%8F%BE%E5%9C%A8%E4%BD%8D%E7%BD%AE%29&iwloc=A'>Googleマップ確認</a><br /><br />";
+			}
+
+			// 位置情報取得処理が失敗した時にコールされる関数
+			// 引数として、code(コード)とmessage(メッセージ)の2つを持ったpositionErrorが渡される
+			function errorCallback(positionError){
+
+				// メッセージを表示
+				//document.getElementById("message").innerHTML = "API failed.<br />";
+
+
+				// 引数positionErrorの中身2つを取り出す
+
+				// コード(1～3のいずれかの値)
+				var code = positionError.code;
+
+				// メッセージ(開発者向けデバッグ用メッセージ)
+				var message = positionError.message;
+
+
+                //map = new google.maps.Map(document.getElementById('map'), {
+                //    center: {lat: -34.397, lng: 150.644},
+                //    zoom: 8
+                //});
+                
+				// コードに応じたメッセージを表示
+				switch (code) {
+					case positionError.PERMISSION_DENIED: // codeが1
+						//document.getElementById("message").innerHTML += "You do not have permission for Geolocation API.<br />";
+						break;
+
+					case positionError.POSITION_UNAVAILABLE: // codeが2
+						//document.getElementById("message").innerHTML += "Could not determine current location information.<br />";
+						break;
+
+					case positionError.TIMEOUT: // codeが3
+						//document.getElementById("message").innerHTML += "The current location information could not be specified within the specified timeout period.<br />";
+						break;
+				}
+
+                if (code == 3) {
+                    // 開発者向けデバッグ用メッセージを表示
+				    //document.getElementById("message").innerHTML = "タイムアウトにより測位をストップしました<br />";
+                }
+			}
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASrbE1PltTWAh7TEoRNTPc-4uYkhUjuns&callback=initMap" async defer></script>
 	</body>
 </html>

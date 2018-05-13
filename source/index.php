@@ -30,6 +30,32 @@ session_start();
         </style>
 
 		<script type="text/javascript">
+            function createXmlHttpRequest()
+            {
+                var xmlhttp=null;
+                if(window.ActiveXObject)
+                {
+                    try
+                    {
+                        xmlhttp=new ActiveXObject("Msxml2.XMLHTTP");
+                    }
+                    catch(e)
+                    {
+                        try
+                        {
+                            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                        }
+                        catch (e2)
+                        {
+                        }
+                    }
+                }
+                else if(window.XMLHttpRequest)
+                {
+                    xmlhttp = new XMLHttpRequest();
+                }
+                return xmlhttp;
+            }
 		</script>
 	</head>
 	<body>
@@ -47,7 +73,7 @@ session_start();
 <?php
                     if (isset($_SESSION["NAME"])) {
 ?>
-                        <p class="navbar-text navbar-right"><a class="btn btn-primary" href="input.php">登録</a>&nbsp;<a class="btn btn-primary" href="logout.php">ログアウト</a></p>
+                        <p class="navbar-text navbar-right"><a class="btn btn-primary" href="input.php">ポツ</a>&nbsp;<a class="btn btn-primary" href="logout.php">ログアウト</a></p>
 <?php
                     } else {
 ?>
